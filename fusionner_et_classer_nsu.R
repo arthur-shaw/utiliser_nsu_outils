@@ -2,7 +2,6 @@
 # Fournir les répertoires
 # =============================================================================
 
-
 projet_dir <- "C:/EHCVM/NSU/"                       # où se trouve le projet
 
 # NSU de consommation
