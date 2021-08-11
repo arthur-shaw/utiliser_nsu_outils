@@ -1,0 +1,10 @@
+# zip files
+*.zip
+
+# Stata data files
+*.dta
+
+# other contents of export archives
+*.txt
+*.pdf
+*.xml
