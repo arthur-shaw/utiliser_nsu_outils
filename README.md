@@ -23,11 +23,12 @@ Veuillez lire ici-bas comment obtenir et installer ces logiciels
 
 ### R
 
-Suivre ce [lien](https://cran.r-project.org/) Cliquer sur le lien
-approprié pour votre système d’exploitation Cliquer sur `base`
-Télécharger et installer (e.g.,
-[ceci](https://cran.r-project.org/bin/windows/base/R-4.1.1-win.exe) pour
-Windows)
+-   Suivre ce [lien](https://cran.r-project.org/)
+-   Cliquer sur le lien approprié pour votre système d’exploitation
+-   Cliquer sur `base`
+-   Télécharger et installer (e.g.,
+    [ceci](https://cran.r-project.org/bin/windows/base/R-4.1.1-win.exe)
+    pour Windows)
 
 ### RTools
 
@@ -45,11 +46,12 @@ certains packages (e.g., `{dplyr}`).
 
 ### RStudio
 
-Suivre ce [lien](https://www.rstudio.com/products/rstudio/) Sélectionner
-RStudio Desktop puis Open Source Edition Cliquer sur le lien approprié
-pour votre système d’exploitation Télécharger et installer (e.g.,
-[ceci](https://www.rstudio.com/products/rstudio/download/#download) pour
-Windows)
+-   Suivre ce [lien](https://www.rstudio.com/products/rstudio/)
+-   Sélectionner RStudio Desktop puis Open Source Edition
+-   Cliquer sur le lien approprié pour votre système d’exploitation
+-   Télécharger et installer (e.g.,
+    [ceci](https://www.rstudio.com/products/rstudio/download/#download)
+    pour Windows)
 
 ### Ce programme
 
@@ -77,9 +79,13 @@ Ce programme organise les fichiers comme suit:
     #> |       +-- donnees
     #> |       \-- images
     #> +-- docs
-    #> \-- production
-    #>     +-- entree
-    #>     \-- sortie
+    #> +-- production
+    #> |   +-- entree
+    #> |   \-- sortie
+    #> \-- renv
+    #>     +-- library
+    #>     |   \-- R-4.0
+    #>     \-- local
 
 Pour que le programme produit des sorties, il faut lui fournir des
 inputs: des données et des images.
@@ -171,9 +177,44 @@ Une fois les préparatifs ci-haut terminés, il est temps de lancer le
 programme. Pour ce faire:
 
 -   Ouvrir RStudio
+-   Ouvrir le fichier `utiliser_nsu_outils.Rproj` qui aura l’effet de
+    fournir les ressources du projet
 -   Ouvrir le fichier `fusionner_et_classer_nsu.R` que vous avez modifié
     plus haut
 -   Lancer le programme
+-   Accepter de mettre à jour les packages
+
+Après avoir ouvert le fichier `utiliser_nsu_outils.Rproj`, RStudio
+affichera un message comme suit, indiquant que:
+
+![](docs/renv_loads_dependencies_1.png)
+
+-   Le package `{renv}`, qui est reponsable contrôles la version des
+    packages chez tous les utilisateurs, a été installé
+-   La version de R installée sur votre machine soit est soit n’est pas
+    en en phase avec la version indiqué dans le fichier de contrôle de
+    version.
+
+Si votre version de R n’est pas en accord avec la version de R attendu,
+veuillez installer la version convenue. S’il s’agit d’une plus ancienne
+version de R, il faut aller la chercher sur CRAN:
+
+-   Suivre les instructions [ici](#r)
+-   Suivre le lien montré ici-bas ![](docs/previous_versions.png)
+-   Chercher, obtenir, et installer la version convenue (e.g., 4.0.4)
+    ![](docs/select_previous_version.png)
+
+Lors du premier lancement du, RStudio demandera si vous voulez adopter
+les packages demandé pour ce projet, comme indiqué ici-bas.
+
+![](docs/renv_loads_dependencies_2.png)
+
+Taper `y` dans la console de RStudio. Ceci créera un répertoire pour ce
+projet dont les versions des packages s’accorderont avec ce qui est jugé
+nécessaire pour le bon déroulement du programme. Ceci n’aura pas d’effet
+sur les versions des packages installées sur votre machine. Pour en
+savoir plus, regarder la documentation de `{renv}`
+[ici](https://rstudio.github.io/renv/articles/renv.html).
 
 ### Réagir aux problèmes
 

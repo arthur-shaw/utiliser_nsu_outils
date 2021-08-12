@@ -19,32 +19,12 @@ nsu_prod_entree <- paste0(nsu_prod_dir, "entree/") # où se trouvent les donnée
 nsu_prod_sortie <- paste0(nsu_prod_dir, "sortie/")  # où les bases fusionnées seront sauvegardées
 
 # =============================================================================
-# Charger les packages requis
+# Charger les packages requis dans les versions requises
 # =============================================================================
 
-# packages requis
-packagesNeeded <- c(
-    "devtools",     # faciliter l'installation de {nsuoutils} depuis GitHub
-    "nsuoutils"     # fusionner  les bases et classer les images NSU
-)
-
-# identifier les packages à installer
-packagesToInstall <- packagesNeeded[!(packagesNeeded %in% installed.packages()[,"Package"])]
-
-if ("devtools" %in% packagesToInstall) {
-    install.packages(
-        "devtools",  
-        quiet = TRUE, 
-        repos = 'https://cloud.r-project.org/', 
-        dep = TRUE
-    )
-}
-
-if ("nsuoutils" %in% packagesToInstall) {
-    devtools::install_github("arthur-shaw/nsuoutils")
-}
-
-library(nsuoutils)
+# mettre en place toutes les dépendences pour que le programme marche 
+# de la même manière chez chaque utilisateur
+renv::restore()
 
 # =============================================================================
 # NSU de consommation
