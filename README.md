@@ -85,7 +85,8 @@ Ce programme organise les fichiers comme suit:
     #> \-- renv
     #>     +-- library
     #>     |   \-- R-4.0
-    #>     \-- local
+    #>     +-- local
+    #>     \-- staging
 
 Pour que le programme produit des sorties, il faut lui fournir des
 inputs: des données et des images.
@@ -108,7 +109,8 @@ occupe un dossier à lui. Par exemple:
 Adapter le programme au contexte. Ceci implique deux étapes:
 
 1.  Modifier Modifier le lien vers votre programme
-2.  Modifier `dir_regexp` pour les fichiers de production
+2.  Spécifier les composants d’une strate
+3.  Modifier `dir_regexp` pour les fichiers de production
 
 #### Modifier le lien vers votre programme
 
@@ -137,6 +139,29 @@ Pour modifier le programme:
 -   Ouvrir le fichier `fusionner_et_classer_nsu.R`
 -   Modifier la valeur de la variable `projet_dir`
 -   Sauvegarder le programme
+
+#### Spécifier les composants d’une strate
+
+Des répertoires seront créés par produit-unité-strate. Pour définir les
+strates d’intérêt de l’enquête, fournir une vecteur de nom de variables
+qui, ensemblent, forment les strates de l’échantillon NSU.
+
+En de termes concrets, modifier la valeur de la variable
+`variables_strate`. L’exemple ici-bas montre le cas, assez fréquent, de
+strates composés par la région (`s00q01`) et le milieu (`s00q04`).
+
+``` r
+# =============================================================================
+# Définir les strates
+# =============================================================================
+
+# Mettre les variables qui, ensemble, définissent les strates
+# Les valeurs serviront à créer des sous-répertoires strates au sein de chaque
+# répertoire de produit-unité observé
+# - en cas de plusieurs variables, formuler comme suit: c("var1", "var2")
+# - en cas d'une seule variable formuler comme un texte: "var1"
+variables_strate <- c("s00q01", "s00q04")
+```
 
 #### Modifier `dir_regexp` pour les fichiers de production
 
