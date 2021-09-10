@@ -241,26 +241,6 @@ sur les versions des packages installées sur votre machine. Pour en
 savoir plus, regarder la documentation de `{renv}`
 [ici](https://rstudio.github.io/renv/articles/renv.html).
 
-### Réagir aux problèmes
-
-Si vous disposer d’un compte GitHub, créer un issue
-[ici](https://github.com/arthur-shaw/nsuoutils), chez le package
-responsable des manipulations faites dans ce programme.
-
-Si vous n’avez pas de compte, envoyer un message.
-
-Dans les deux cas, tâcher de fournir un descriptif détaillé et, si
-possible, un exemple reproduisible. Dans le descriptif détaillé,
-envoyer:
-
--   Description des étapes suivies
--   Capture d’écran du message d’erreur
--   Informations concernant votre séance de travail (i.e., executer la
-    commande `sessionInfo()` et copier-coller le résultat)
-
-Dans l’exemple reproduisible, partager les données d’entrée par un moyen
-sécurisé (i.e., pas GitHub).
-
 ### Afficher les images non-classées
 
 La fonction `nsuoutils::sort_images()` tente de classer toutes les
@@ -279,3 +259,87 @@ et à mesure que de nouvelles informations sont reçues du terrain. Les
 données seront refusionnées, et les images seront re-classées en
 fonction des informations dans les bases de données et d’images,
 respectivement.
+
+### Dépanner
+
+#### Problèmes connus
+
+Si vous lancez le programme comme indiqué ci-haut et rencontrez une
+erreur qui ressemble celle ici-bas, R rencontre un problème à
+télécharger et installer les packages requis.
+
+![](docs/renv_error.png)
+
+Pour surmonter ce problème, veuillez suivre ces étapes:
+
+-   Ouvrir le fichier Rproj
+-   Avant de lancer le programme, exécuter la commande:
+    `Sys.setenv(RENV_DOWNLOAD_METHOD = "wininet")`
+-   Lancer le programmer
+
+Si le lancement du programme échoue à nouveau, il est fort à parier que
+R–ou plutôt le package `{renv}`–rencontre problèmes à télécharger et
+installer le package `{nsuoutils}` depuis GitHub.
+
+Pour aider R à installer `{nsuoutils}`, veuillez suivre ces étapes:
+
+-   Ouvrir une nouvelle instance de RStudio. C’est à dire:
+    -   Fermer toute fenêtre de RStudio déjà ouvert
+    -   Ouvrir RStudio à nouveau
+    -   S’assurer que le projet `utiliser_nsu_outils` est bien fermé. Au
+        besoin, le fermer comme montré ici-bas:
+
+![](docs/fermer_le_projet.png)
+
+-   Installer les packages manquants en exécutant les commandes
+    suivantes:
+
+``` r
+# d'abord installer {nsuoutils}
+install.packages("devtools")
+devtools::install_github("arthur-shaw/nsuoutils")
+ 
+# ensuite, installer {rmarkdown} 
+# au cas où il n'est pas installé lors de l'installation de {nsuoutils}
+install.packages("rmarkdown")
+```
+
+-   Relancer le programme le programme comme indiqué [ici](#lancer)
+
+#### Problèmes inconnus
+
+Si vous disposer d’un compte GitHub, créer un issue
+[ici](https://github.com/arthur-shaw/nsuoutils), chez le package
+responsable des manipulations faites dans ce programme.
+
+Si vous n’avez pas de compte, envoyer un message.
+
+Dans les deux cas, tâcher de fournir un descriptif détaillé et, si
+possible, un exemple reproduisible. Dans le descriptif détaillé,
+envoyer:
+
+-   Description des étapes suivies
+-   Capture d’écran du message d’erreur
+-   Informations concernant votre séance de travail, lancer des
+    commandes après l’échec du programme et copier-coller le résultat:
+
+``` r
+# ceci fournit des informations détaillées sur les actions prises par {renv}
+# dans l'installation de packages requis, et met en évidence
+# les problèmes rencontrés et les paramètres utilisé 
+renv::diagnostics()
+
+# ces commandes fournissent des informations sur:
+# - la méthode employée pour télécharger les packages
+# - le répositore où les packages sont recherchés
+getOption("download.file.method")
+capabilities("libcurl")
+getOption("repos")
+
+# cette commande fournit des informations sur votre environnement d'exécution
+sessionInfo()
+```
+
+Dans l’exemple reproduisible, partager les données d’entrée par un moyen
+sécurisé (i.e., pas GitHub, rien de publique où d’autres peuvent voir
+les données).
