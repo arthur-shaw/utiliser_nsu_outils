@@ -93,6 +93,77 @@ nsuoutils::sort_images(
 # NSU de production
 # =============================================================================
 
+# -----------------------------------------------------------------------------
+# modifier le nom de certaines varaibles pour s'aligner
+# -----------------------------------------------------------------------------
+
+#' Corriger les nom de colonnes
+#' 
+#' Retrouver et remplacer avec un texte
+#' 
+#' @param path Où trouver le fichier cible
+#' @param match Texte à rechercher dans les colonnes à corriger
+#' @param find Texte à retrouver
+#' @param replace Texte à remplacer
+correct_cols <- function(
+  path,
+  match,
+  find,
+  replace
+) {
+
+  path |>
+    haven::read_dta() |>
+    dplyr::rename_with(
+      .cols = dplyr::matches(match),
+      .fn = ~ stringr::str_replace(
+        string = .x, 
+        pattern = find,
+        replacement = replace
+      )
+    ) |>
+    haven::write_dta(path = path)
+
+}
+
+# Aubergine
+purrr::walk2(
+    .x = c("nsu_production_2_STATA_All/", "nsu_production_3_STATA_All/", "nsu_production_2_STATA_All/", "nsu_production_3_STATA_All/"),
+    .y = c("unitesAutre1_Aubergine.dta", "unitesAutre1_Aubergine.dta", "unitesAutre2_Aubergine.dta", "unitesAutre2_Aubergine.dta"),
+    .f = ~ correct_cols(
+        path = paste0(nsu_prod_entree, .x, .y),
+        match = "Aubergin_",
+        find = "Aubergin",
+        replace = "Aubergine"
+    )
+
+)
+
+# Gombo
+purrr::walk(
+    .x = c("nsu_production_2_STATA_All/", "nsu_production_3_STATA_All/"),
+    .f =  ~ correct_cols(
+        path = paste0(nsu_prod_entree, .x, "unitesAutre2_Gombo.dta"),
+        match = "gombo",
+        find = "gombo",
+        replace = "Gombo"
+    )
+)
+
+
+
+# haven::read_dta(paste0(nsu_prod_entree, "nsu_production_2_STATA_All/", "unitesAutre1_Aubergine.dta")) |>
+#     dplyr::rename_with(
+#         .cols = dplyr::matches("Aubergin_"),
+#         .fn = ~ stringr::str_replace(string = .x, pattern = "Aubergin", replacement = "Aubergine")
+#     )
+# haven::write_dta(data = aubergines_1, path = paste0(nsu_prod_entree, "nsu_production_2_STATA_All/", "unitesAutre1_Aubergine.dta"))
+# 
+
+# -----------------------------------------------------------------------------
+# Fusionner
+# -----------------------------------------------------------------------------
+
 nsuoutils::combine_nsu_data(
     dir_in = nsu_prod_entree,
     dir_regexp = "_production_", # NOTEZ BIEN: modifier selon votre situation
