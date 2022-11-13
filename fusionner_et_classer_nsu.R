@@ -93,6 +93,226 @@ nsuoutils::sort_images(
 # NSU de production
 # =============================================================================
 
+# -----------------------------------------------------------------------------
+# Corriger des erreurs de nom de variable et de base avant la fusion
+# -----------------------------------------------------------------------------
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# identifier le répertoire où se trouve les fichiers problématiques
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+prob_dir <- fs::dir_ls(path = nsu_prod_entree, type = "directory")
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Fichiers unitesAutre
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+#' Rename variables
+#' 
+#' Replace finale product name with "autre"
+#' 
+#' @param dir Character. Directory where files are stored
+#' @param file Character. File name in `dir`.
+rename_variables <- function(
+    dir,
+    file
+) {
+
+    file_path <- paste0(dir, file)
+
+    df <- haven::read_dta(file = file_path)
+
+    product_name <- stringr::str_extract(
+        string = file, 
+        pattern = "(?<=_)[a-z]+(?=\\.dta)"
+    )
+
+    df_fixed <- df |>
+        dplyr::rename_with(
+            .fn = ~ stringr::str_replace(
+                string = .x,
+                pattern = "(?<=_)[a-z]+(?=[12])",
+                replacement = "autre"
+            )
+        ) |>
+        dplyr::rename_with(
+            .fn = ~ stringr::str_replace(
+                string = .x,
+                pattern = "(?<=unites)[a-z]+(?=[12])",
+                replacement = "Autre"
+            )
+        )
+
+    haven::write_dta(data = df_fixed, path = file_path)
+
+}
+
+#' Rename files to reflect their content
+#' 
+#' Replacing first occurrence of product name with "Autre"
+#' 
+#' @param dir Character. Directory where data files are found
+#' @param pattern Character. Regular expression that identifies the files to be renamed
+rename_files <- function(
+  dir,
+  pattern
+) {
+
+  # find file(s)
+  problem_files <- fs::dir_ls(path = dir, type = "file", regexp = pattern)
+
+  # transform file name
+  # ... extracting product name
+  product_name <- stringr::str_extract(string = problem_files[1], pattern = "(?<=_)[a-z]+(?=\\.dta)")
+  # ... replacing its first occurrence with "Autre
+  fixed_files <- stringr::str_replace(string = problem_files, pattern = product_name, replacement = "Autre")
+  
+  # rename files
+  fs::file_move(path = problem_files, new_path = fixed_files)
+  
+}
+
+#' Fix files
+#' 
+#' By first renaming variables and then renaming files
+#' 
+#' @param dir Character. Directory where data files are found
+#' @param pattern Character. Regular expression that identifies the files to be renamed
+fix_files <- function(dir, pattern) {
+
+    # rename variables
+    file_names <- fs::dir_ls(path = dir, type = "file", regexp = pattern) |>
+        fs::path_file()
+
+    purrr::walk(
+        .x = file_names,
+        .f = ~ rename_variables(
+            dir = dir,
+            file = .x
+        )
+    )
+
+    # rename files
+    rename_files(
+        dir = dir,
+        pattern = pattern
+    )
+
+}
+
+# liste des fichiers problématiques dont le nom suit ce format: "unites[a-z]+[12]_[a-z]\\.dta"
+prob_file_patterns <- c(
+  "unitesananas[12]_ananas\\.dta",
+  "unitesbanane[12]_banane\\.dta",
+  "unitescanscr[12]_canscr\\.dta",
+  "uniteschoufr[12]_choufr\\.dta",
+  "unitesciblet[12]_ciblet\\.dta",
+  "unitescitron[12]_citron\\.dta",
+  "unitescotier[12]_cotier\\.dta",
+  "unitescurpal[12]_curpal\\.dta",
+  "unitesgoyave[12]_goyave\\.dta",
+  "unitesjacq[12]_jacq\\.dta",
+  "unitesnoixco[12]_noixco\\.dta",
+  "unitespapaye[12]_papaye\\.dta",
+  "unitespocaju[12]_pocaju\\.dta",
+  "unitespompin[12]_pompin\\.dta",
+  "unitestifa[12]_tifa\\.dta"
+)
+
+purrr::walk(
+    .x = prob_file_patterns, 
+    .f = ~ fix_files(
+        dir = prob_dir,
+        pattern = .x
+    )
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Fichiers unitesFixes
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+#' Find unitesFixes files with problem in q105 variable name
+#' 
+#' @param dir Character. Directory where files are stored
+#' @param file Character. File name in `dir`.
+find_unites_fixes_probs <- function(
+    dir,
+    file
+) {
+
+    df <- haven::read_dta(paste0(data_dir, file))
+
+    vars <- stringr::str_subset(string = names(df), pattern = "^q105autre")
+
+    has_var <- dplyr::if_else(length(vars) == 0, true = FALSE, false = TRUE) 
+
+    result <- tibble::tribble(
+        ~ file, ~ var,
+        file, has_var
+    )
+
+    return(result)
+
+}
+
+#' Fix q105autre variable name in unitesFixes files
+#' 
+#' @param dir Character. Directory where files are stored
+#' @param file Character. File name in `dir`.
+fix_unites_fixes <- function(
+    dir,
+    file
+) {
+
+    # file path
+    file_path <- paste0(dir, file)
+
+    # ingest file
+    df <- haven::read_dta(file = file_path)
+
+    # rename problem variable
+    df_fixed <- df |>
+        dplyr::rename_with(
+            .fn = ~ stringr::str_replace(
+                string = .x,
+                pattern = "(?<=q105)[a-z]+(?=_)",
+                replacement = "autre"
+            )
+        )
+
+    # save file, overwriting original
+    haven::write_dta(data = df_fixed, path = file_path)
+
+}
+
+# lister les fichiers unitesFixes
+unites_fixes <- fs::dir_ls(path = data_dir, type = "file", regexp = "\\.dta") |>
+    fs::path_file() |> stringr::str_subset(pattern = "^unitesFixes")
+
+# obtenir la liste de ceux avec des problèmes
+has_q105_problem <- unites_fixes |>
+    purrr::map_dfr(
+        .f = ~ find_unites_fixes_probs(
+            dir = prob_dir,
+            file = .x
+        )
+    ) |>
+    dplyr::filter(var == FALSE) |>
+    dplyr::pull(file)
+
+# corriger le problème avec la variable q105autre
+purrr::walk(
+    .x = has_q105_problem,
+    .f = ~ fix_unites_fixes(
+        dir = data_dir,
+        file = .x
+    )
+)
+
+# -----------------------------------------------------------------------------
+# Fusionner
+# -----------------------------------------------------------------------------
+
 nsuoutils::combine_nsu_data(
     dir_in = nsu_prod_entree,
     dir_regexp = "_production_", # NOTEZ BIEN: modifier selon votre situation
